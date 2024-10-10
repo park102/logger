@@ -31,7 +31,7 @@ void setup() {
     Serial.println(F("BME280 test"));
 
 
-    myFile = SD.open("test.txt", FILE_WRITE);
+    
 
 
     unsigned status;
@@ -49,7 +49,7 @@ void setup() {
     }
     
     Serial.println("-- Default Test --");
-    delayTime = 1000;
+    delayTime = 10000;
 
     Serial.println();
     digitalWrite(LED, HIGH);
@@ -59,6 +59,7 @@ void setup() {
 void loop() {
     printValues();
     delay(delayTime);
+    //myFile = SD.open("log.txt", FILE_WRITE);
 }
 
 
