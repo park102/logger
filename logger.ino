@@ -35,11 +35,11 @@ void loop() {
     Serial.print("Pressure: ");Serial.print(pressure.pressure); Serial.println(" hPa");
     Serial.print("Humidity: ");Serial.print(humidity.relative_humidity); Serial.println(" %rH");
     Serial.println("");
-    SD.open("log.txt", FILE_WRITE);
+    File.open("log.txt", FILE_WRITE);
     File.print("Temp: ");File.print(temp.temperature);File.println(" c")
     File.print("Pressure: ");File.print(pressure.pressure); File.println(" hPa");
     File.print("Humidity: ");File.print(humidity.relative_humidity); File.println(" %rH");
-    SD.close();
+    File.close();
     Serial.println("");
 
     delay(1000);
