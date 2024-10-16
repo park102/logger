@@ -1,87 +1,46 @@
 #include <Wire.h>
-#include <SPI.h>
+#include <Adafruit_MS8607.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h>
+#include <SPI.h>
 #include <SD.h>
 
-#define chipSelect 4
+File File;
 
-File myFile;
+Adafruit_MS8607 ms8607;
+void setup(void) {
+    Serial.begin(115200);
+    while (!Serial) delay(10);     // will pause Zero, Leonardo, etc until serial console opens
 
+    Serial.println("Adafruit MS8607 test!");
 
-#define BME_SCK 13
-#define BME_MISO 12
-#define BME_MOSI 11
-#define BME_CS 10
-
-#define SEALEVELPRESSURE_HPA (1013.25)
-
-Adafruit_BME280 bme;
-#define LED 0
-unsigned long delayTime;
-void setup() {
-  // put your setup code here, to run once:
-    pinMode(LED, OUTPUT);
-    
-    Serial.begin(9600);
-    while(!Serial);    // time to get serial running
-    if (!SD.begin(chipSelect)) {
-      Serial.println("initialization failed.");
+    // Try to initialize!
+    if (!ms8607.begin()) {
+        Serial.println("Failed to find MS8607 chip");
+        while (1) { delay(10); }
     }
-    Serial.println(F("BME280 test"));
+    Serial.println("MS8607 Found!");
 
+    ms8607.setHumidityResolution(MS8607_HUMIDITY_RESOLUTION_OSR_8b);
 
-    
+    ms8607.setPressureResolution(MS8607_PRESSURE_RESOLUTION_OSR_4096);
 
-
-    unsigned status;
-    
-    // default settings
-    status = bme.begin();  
-    if (!status) {
-        Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
-        Serial.print("SensorID was: 0x"); Serial.println(bme.sensorID(),16);
-        Serial.print("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
-        Serial.print("   ID of 0x56-0x58 represents a BMP 280,\n");
-        Serial.print("        ID of 0x60 represents a BME 280.\n");
-        Serial.print("        ID of 0x61 represents a BME 680.\n");
-        while (1) delay(10);
-    }
-    
-    Serial.println("-- Default Test --");
-    delayTime = 10000;
-
-    Serial.println();
-    digitalWrite(LED, HIGH);
+    SD.begin(4)
 
 }
 
 void loop() {
-    printValues();
-    delay(delayTime);
-    //myFile = SD.open("log.txt", FILE_WRITE);
-}
+    sensors_event_t temp, pressure, humidity;
+    ms8607.getEvent(&pressure, &temp, &humidity);
+    Serial.print("Temperature: ");Serial.print(temp.temperature); Serial.println(" degrees C");
+    Serial.print("Pressure: ");Serial.print(pressure.pressure); Serial.println(" hPa");
+    Serial.print("Humidity: ");Serial.print(humidity.relative_humidity); Serial.println(" %rH");
+    Serial.println("");
+    SD.open("log.txt", FILE_WRITE);
+    File.print("Temp: ");File.print(temp.temperature);File.println(" c")
+    File.print("Pressure: ");File.print(pressure.pressure); File.println(" hPa");
+    File.print("Humidity: ");File.print(humidity.relative_humidity); File.println(" %rH");
+    SD.close();
+    Serial.println("");
 
-
-void printValues() {
-
-    Serial.print("Temperature = ");
-    Serial.print(bme.readTemperature());
-    Serial.println(" °C");
-
-    Serial.print("Pressure = ");
-
-    Serial.print(bme.readPressure() / 100.0F);
-    Serial.println(" hPa");
-
-    Serial.print("Approx. Altitude = ");
-    Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
-    Serial.println(" m");
-
-    Serial.print("Humidity = ");
-    Serial.print(bme.readHumidity());
-    Serial.println(" %");
-
-    Serial.println();
-
+    delay(1000);
 }
