@@ -4,7 +4,7 @@
 #include <SPI.h>
 #include <SD.h>
 
-File File;
+File myFile;
 
 Adafruit_MS8607 ms8607;
 void setup(void) {
@@ -24,7 +24,7 @@ void setup(void) {
 
     ms8607.setPressureResolution(MS8607_PRESSURE_RESOLUTION_OSR_4096);
 
-    SD.begin(4)
+    SD.begin(4);
 
 }
 
@@ -35,11 +35,11 @@ void loop() {
     Serial.print("Pressure: ");Serial.print(pressure.pressure); Serial.println(" hPa");
     Serial.print("Humidity: ");Serial.print(humidity.relative_humidity); Serial.println(" %rH");
     Serial.println("");
-    File.open("log.txt", FILE_WRITE);
-    File.print("Temp: ");File.print(temp.temperature);File.println(" c")
-    File.print("Pressure: ");File.print(pressure.pressure); File.println(" hPa");
-    File.print("Humidity: ");File.print(humidity.relative_humidity); File.println(" %rH");
-    File.close();
+    myFile = SD.open("log.txt", FILE_WRITE);
+    myFile.print("Temp: ");myFile.print(temp.temperature);myFile.println(" c");
+    myFile.print("Pressure: ");myFile.print(pressure.pressure); myFile.println(" hPa");
+    myFile.print("Humidity: ");myFile.print(humidity.relative_humidity); myFile.println(" %rH");
+    myFile.close();
     Serial.println("");
 
     delay(1000);
